@@ -1,3 +1,7 @@
+# Other files
+*.html
+*.txt
+
 # Vscode config
 .vscode/
 .idea/

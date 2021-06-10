@@ -1,8 +1,8 @@
 import unittest
-import ProfessorFinder
+from ProfessorFinder.content_crawler.tsinghua_crawler import all_pack
 
 
-class SomethingTestCase(unittest.TestCase):
+class TsinghuaTestCase(unittest.TestCase):
 
     def setUp(self):
         pass
