@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 
 
 class WebCrawler(object):
+
     def __init__(self, url, test=False):
         self._url = url
         self._internal_link_parse()     # parse link
