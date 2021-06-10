@@ -13,11 +13,14 @@ long_description = read('README.rst')  # use pandoc to automatically generate RE
 setup(
     name='ProfessorFinder',
     version=ProfessorFinder.__version__,
-    licence='',
-    url='',
-    author='',
-    author_email='',
-    install_requires=[],  # python freeze > requirements.txt
+    licence='https://opensource.org/licenses/MIT',
+    url='https://github.com/KujouRinka/ProfessorFinder',
+    author='KujouRinka',
+    author_email='kujourinka@gmail.com',
+    install_requires=[
+        'requests',
+        'beautifulsoup4',
+    ],
     description='',
     long_description=long_description,
     packages=['ProfessorFinder'],
