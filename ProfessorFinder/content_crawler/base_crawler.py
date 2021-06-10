@@ -8,11 +8,12 @@ class WebCrawler(object):
     def __init__(self, url, test=False):
         self._url = url
         self._internal_link_parse()     # parse link
+        self.all_info = []
         if not test:
             self._page = self._get_page()
             if self._page is None:
                 print('error')
-            self.bs = BeautifulSoup(self._page.text, 'lxml')
+            self.bs = self._get_bs()
 
     def handler(self):
         """
@@ -44,3 +45,6 @@ class WebCrawler(object):
         except requests.exceptions.HTTPError:
             response = None
         return response
+
+    def _get_bs(self):
+        return BeautifulSoup(self._page.text, 'lxml')
