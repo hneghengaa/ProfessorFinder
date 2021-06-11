@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 
 class WebCrawler(object):
 
+    mail_re = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
+
     def __init__(self, url, test=False):
         self._url = url
         self._internal_link_parse()     # parse link
@@ -39,6 +41,7 @@ class WebCrawler(object):
         o = urlparse(self._url)
         self._scheme = o.scheme
         self._netloc = o.netloc
+        self._path = o.path
 
     def _get_page(self):
         try:
