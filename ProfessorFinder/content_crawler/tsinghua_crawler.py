@@ -9,7 +9,7 @@ class TsinghuaArch(WebCrawler):
 
     def __init__(self):
         url = 'http://www.arch.tsinghua.edu.cn/column/rw'
-        super().__init__(url)
+        super().__init__(url, '建筑学院')
 
     def handler(self):
         bs = self.bs.find('div', {'class': 'tabContent'})
@@ -33,7 +33,7 @@ class TsinghuaSem(WebCrawler):
 
     def __init__(self):
         url = 'http://www.sem.tsinghua.edu.cn/tesearch/jssearch.html'
-        super().__init__(url)
+        super().__init__(url, '经济学院')
 
     def handler(self):
         self._url = 'http://mis.sem.tsinghua.edu.cn/psc/CRMPRD/EM' \
@@ -52,7 +52,7 @@ class TsinghuaCivil(WebCrawler):  # something to solve?
 
     def __init__(self):
         url = 'http://www.civil.tsinghua.edu.cn/20.html'
-        super().__init__(url)
+        super().__init__(url, '土木水利学院')
 
     def handler(self):
         data_link = {}
@@ -86,7 +86,7 @@ class TsinghuaEnv(WebCrawler):
 
     def __init__(self):
         url = 'http://www.env.tsinghua.edu.cn/szdw/jyjs/ys.htm'
-        super().__init__(url)
+        super().__init__(url, '环境学院')
 
     def handler(self):
         all_professors = []  # each element is a bs object
@@ -112,7 +112,7 @@ class TsinghuaEnv(WebCrawler):
         for professor, link in professors.items():
             mail = self._get_mail(link)
             self.all_info.append(('清华大学', '环境学院',
-                                  professors, mail))
+                                  professor, mail, link))
         return self.all_info
 
     @classmethod
@@ -132,8 +132,10 @@ class TsinghuaEnv(WebCrawler):
             return None
 
 
-all_pack = [TsinghuaArch(), TsinghuaSem(), TsinghuaCivil(),
-            TsinghuaCivil()]
+def get_pack():
+    all_pack = ['清华大学', TsinghuaArch(), TsinghuaSem(),
+                TsinghuaCivil(), TsinghuaEnv()]
+    return all_pack
 
 
 def main():
