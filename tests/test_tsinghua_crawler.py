@@ -1,5 +1,5 @@
 import unittest
-from ProfessorFinder.content_crawler.tsinghua_crawler import all_pack
+from ProfessorFinder.content_crawler.tsinghua_crawler import get_pack
 
 
 class TsinghuaTestCase(unittest.TestCase):
