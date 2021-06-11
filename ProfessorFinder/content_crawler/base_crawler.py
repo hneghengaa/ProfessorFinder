@@ -8,7 +8,8 @@ class WebCrawler(object):
 
     mail_re = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
 
-    def __init__(self, url, test=False):
+    def __init__(self, url, name='', test=False):
+        self.name = name
         self._url = url
         self._internal_link_parse()     # parse link
         self.all_info = []
