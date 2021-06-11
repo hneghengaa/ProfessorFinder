@@ -20,6 +20,7 @@ setup(
     install_requires=[
         'requests',
         'beautifulsoup4',
+        'openpyxl'
     ],
     description='',
     long_description=long_description,

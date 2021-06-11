@@ -1,6 +1,7 @@
 # Other files
 *.html
 *.txt
+*.xlsx
 
 # Vscode config
 .vscode/
