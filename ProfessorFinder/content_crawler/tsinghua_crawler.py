@@ -160,8 +160,8 @@ class TsinghuaSppm(WebCrawler):
 
 
 def get_pack():
-    all_pack = ['清华大学', TsinghuaArch(), TsinghuaSem(),
-                TsinghuaCivil(), TsinghuaEnv(), TsinghuaSppm()]
+    all_pack = {'清华大学': 0, TsinghuaArch: 1, TsinghuaSem: 1,
+                TsinghuaCivil: 1, TsinghuaEnv: 1, TsinghuaSppm: 1}
     return all_pack
 
 
