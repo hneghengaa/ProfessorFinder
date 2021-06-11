@@ -94,7 +94,8 @@ class TsinghuaEnv(WebCrawler):
         bs = bs.find_all('a')
         all_professors.extend(bs)
 
-        resp = requests.get('http://www.env.tsinghua.edu.cn/szdw/jyjs/jyssz.htm')
+        resp = requests.get('http://www.env.tsinghua.edu.cn/szdw/'
+                            'jyjs/jyssz.htm')
         bs = BeautifulSoup(resp.text, 'lxml')
         bs = bs.find_all('p', {'style': 'text-indent: 0em;'})
         for group in bs:
@@ -132,14 +133,40 @@ class TsinghuaEnv(WebCrawler):
             return None
 
 
+class TsinghuaSppm(WebCrawler):
+
+    def __init__(self):
+        url = 'http://www.sppm.tsinghua.edu.cn/szdw/qzjs/'
+        super().__init__(url, '公共管理学院')
+
+    def handler(self):
+        bs = self.bs.find('div', {'id': 'xp_zw'}).table
+        tabs = bs.find_all('tr')
+        for tab in tabs:
+            name_tab = tab.find('td', {'width': '91'})
+            email_tab = tab.find('td', {'width': '164'})
+            try:
+                name = name_tab.get_text()
+                name = name.encode('iso8859-1').decode('gbk')
+            except AttributeError:
+                continue
+            link = name_tab.a.attrs['href']
+            link = self._internal_link_convert(link)
+            email = None if email_tab.get_text().isspace() \
+                else email_tab.get_text()
+            self.all_info.append(('清华大学', '公共管理学院',
+                                  name, email, link))
+        return self.all_info
+
+
 def get_pack():
     all_pack = ['清华大学', TsinghuaArch(), TsinghuaSem(),
-                TsinghuaCivil(), TsinghuaEnv()]
+                TsinghuaCivil(), TsinghuaEnv(), TsinghuaSppm()]
     return all_pack
 
 
 def main():
-    print(TsinghuaEnv().run())
+    print(TsinghuaSppm().run())
 
 
 if __name__ == '__main__':
