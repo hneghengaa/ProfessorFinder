@@ -53,3 +53,12 @@ class WebCrawler(object):
 
     def _get_bs(self):
         return BeautifulSoup(self._page.text, 'lxml')
+
+    @classmethod
+    def _get_email(cls, url):
+        """
+        needs to be overwritten
+        receive a url then parse the page
+        and return email if possible.
+        """
+        return ''
