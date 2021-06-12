@@ -25,7 +25,7 @@ class WebCrawler(object):
         return school, department, name, email, bio of teacher.
         :return:
         """
-        pass
+        return self.all_info
 
     def run(self):
         return self.handler()
