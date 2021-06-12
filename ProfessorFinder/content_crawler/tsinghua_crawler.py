@@ -5,7 +5,19 @@ from bs4 import BeautifulSoup
 from ProfessorFinder.content_crawler.base_crawler import WebCrawler
 
 
-class TsinghuaArch(WebCrawler):
+class TsinghuaCrawler(WebCrawler):
+
+    def __init__(self, url, name):
+        super().__init__(url, name)
+
+    def append_info(self, name, email, url):
+        self.all_info.append(('清华大学', self.name, name, email, url))
+
+    def get_info(self):
+        return self.all_info
+
+
+class TsinghuaArch(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.arch.tsinghua.edu.cn/column/rw'
@@ -22,14 +34,13 @@ class TsinghuaArch(WebCrawler):
             try:
                 name = name_tab.get_text()
                 email = email_tab.get_text()
-                self.all_info.append(('清华大学', '建筑学院',
-                                      name, email, url_tab))
+                self.append_info(name, url_tab, email)
             except AttributeError:
                 pass
-        return self.all_info
+        return self.get_info()
 
 
-class TsinghuaSem(WebCrawler):
+class TsinghuaSem(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.sem.tsinghua.edu.cn/tesearch/jssearch.html'
@@ -43,12 +54,12 @@ class TsinghuaSem(WebCrawler):
         self._page = self._get_page()
         data_list = json.loads(self._page.text)
         for each in data_list:
-            self.all_info.append(('清华大学', '经济学院', each['name'],
-                                  each['email'], each['detailurl']))
-        return self.all_info
+            self.append_info(each['name'], each['email'],
+                             each['detailurl'])
+        return self.get_info()
 
 
-class TsinghuaCivil(WebCrawler):  # something to solve?
+class TsinghuaCivil(TsinghuaCrawler):  # something to solve?
 
     def __init__(self):
         url = 'http://www.civil.tsinghua.edu.cn/20.html'
@@ -65,9 +76,8 @@ class TsinghuaCivil(WebCrawler):  # something to solve?
             data_link[name] = link
         for name, link in data_link.items():
             mail = self._get_mail(link)
-            self.all_info.append(('清华大学', '土木水利学院',
-                                  name, mail, link))
-        return self.all_info
+            self.append_info(name, mail, link)
+        return self.get_info()
 
     @classmethod
     def _get_mail(cls, link):
@@ -82,7 +92,7 @@ class TsinghuaCivil(WebCrawler):  # something to solve?
             return None
 
 
-class TsinghuaEnv(WebCrawler):
+class TsinghuaEnv(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.env.tsinghua.edu.cn/szdw/jyjs/ys.htm'
@@ -112,9 +122,8 @@ class TsinghuaEnv(WebCrawler):
             professors[name] = link
         for professor, link in professors.items():
             mail = self._get_mail(link)
-            self.all_info.append(('清华大学', '环境学院',
-                                  professor, mail, link))
-        return self.all_info
+            self.append_info(professor, mail, link)
+        return self.get_info()
 
     @classmethod
     def _get_mail(cls, url):
@@ -133,7 +142,7 @@ class TsinghuaEnv(WebCrawler):
             return None
 
 
-class TsinghuaSppm(WebCrawler):
+class TsinghuaSppm(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.sppm.tsinghua.edu.cn/szdw/qzjs/'
@@ -154,12 +163,11 @@ class TsinghuaSppm(WebCrawler):
             link = self._internal_link_convert(link)
             email = None if email_tab.get_text().isspace() \
                 else email_tab.get_text()
-            self.all_info.append(('清华大学', '公共管理学院',
-                                  name, email, link))
-        return self.all_info
+            self.append_info(name, email, link)
+        return self.get_info()
 
 
-class TsinghuaMe(WebCrawler):
+class TsinghuaMe(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://me.tsinghua.edu.cn/szdw/ys.htm'
@@ -184,14 +192,10 @@ class TsinghuaMe(WebCrawler):
             link = self._internal_link_convert(link[2:])
             all_professors[name] = link
 
-        print(all_professors, 'hh')
         for name, link in all_professors.items():
-            print(name, link)
             email = self._get_mail(link)
-            self.all_info.append(('清华大学',
-                                  '信息科学技术学院机械工程系',
-                                  name, email, link))
-        return self.all_info
+            self.append_info(name, email, link)
+        return self.get_info()
 
     @classmethod
     def _get_mail(cls, url):
@@ -205,7 +209,7 @@ class TsinghuaMe(WebCrawler):
             return None
 
 
-class TsinghuaDpi(WebCrawler):
+class TsinghuaDpi(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://faculty.dpi.tsinghua.edu.cn/index.html'
@@ -219,10 +223,8 @@ class TsinghuaDpi(WebCrawler):
                 link = professor.a.attrs['href']
                 link = self._internal_link_convert(link)
                 email = self._get_email(link)
-                self.all_info.append(('清华大学',
-                                      '信息科学技术学院精密仪器系',
-                                      name, email, link))
-        return self.all_info
+                self.append_info(name, email, link)
+        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -238,9 +240,9 @@ class TsinghuaDpi(WebCrawler):
 
 def get_pack():
     all_pack = {
-        '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
-        TsinghuaCivil: 0, TsinghuaEnv: 0, TsinghuaSppm: 0,
-        TsinghuaMe: 0, TsinghuaDpi: 1
+        '清华大学': 0, TsinghuaArch: 1, TsinghuaSem: 1,
+        TsinghuaCivil: 1, TsinghuaEnv: 1, TsinghuaSppm: 1,
+        TsinghuaMe: 1, TsinghuaDpi: 1
     }
     return all_pack
 
