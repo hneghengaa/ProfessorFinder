@@ -26,3 +26,4 @@ def write_excel(uni_departments):
             for each in department.run():
                 ws.append(each)
     wb.save(filename)
+    wb.close()
