@@ -159,14 +159,63 @@ class TsinghuaSppm(WebCrawler):
         return self.all_info
 
 
+class TsinghuaMe(WebCrawler):
+
+    def __init__(self):
+        url = 'http://me.tsinghua.edu.cn/szdw/ys.htm'
+        super().__init__(url, '信息科学技术学院机械工程系')
+
+    def handler(self):
+        all_professors = {}
+        bs = self.bs.find('div', {'class': 'ys-con'})
+        for professor in bs.div.find_all('a'):
+            name = professor.attrs['title'] \
+                .encode('iso8859-1').decode('utf-8')
+            link = professor.attrs['href']
+            link = self._internal_link_convert(link[2:])
+            all_professors[name] = link
+        r = requests.get('http://me.tsinghua.edu.cn/szdw/zzjs.htm')
+        bs = BeautifulSoup(r.text, 'lxml')
+        bs = bs.find('div', {'class': 'tea-text'})
+        for professor in bs.find_all('a'):
+            name = professor.attrs['title'] \
+                .encode('iso8859-1').decode('utf-8')
+            link = professor.attrs['href']
+            link = self._internal_link_convert(link[2:])
+            all_professors[name] = link
+
+        print(all_professors, 'hh')
+        for name, link in all_professors.items():
+            print(name, link)
+            email = self._get_mail(link)
+            self.all_info.append(('清华大学',
+                                  '信息科学技术学院机械工程系',
+                                  name, email, link))
+        return self.all_info
+
+    @classmethod
+    def _get_mail(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        tab = bs.find('div', {'class': 't-info-text fl'})
+        email = re.search(cls.mail_re, tab.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
-    all_pack = {'清华大学': 0, TsinghuaArch: 1, TsinghuaSem: 1,
-                TsinghuaCivil: 1, TsinghuaEnv: 1, TsinghuaSppm: 1}
+    all_pack = {
+        '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
+        TsinghuaCivil: 0, TsinghuaEnv: 0, TsinghuaSppm: 0,
+        TsinghuaMe: 1
+    }
     return all_pack
 
 
 def main():
-    print(TsinghuaSppm().run())
+    print(TsinghuaMe().run())
 
 
 if __name__ == '__main__':
