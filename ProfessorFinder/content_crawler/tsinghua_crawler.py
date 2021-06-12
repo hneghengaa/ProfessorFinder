@@ -205,17 +205,48 @@ class TsinghuaMe(WebCrawler):
             return None
 
 
+class TsinghuaDpi(WebCrawler):
+
+    def __init__(self):
+        url = 'http://faculty.dpi.tsinghua.edu.cn/index.html'
+        super().__init__(url, '信息科学技术学院精密仪器系')
+
+    def handler(self):
+        all_professors = {}
+        for bs in self.bs.find_all('div', {'class': 'third'}):
+            for professor in bs.ul.find_all('li'):
+                name = professor.h6.get_text()
+                link = professor.a.attrs['href']
+                link = self._internal_link_convert(link)
+                email = self._get_email(link)
+                self.all_info.append(('清华大学',
+                                      '信息科学技术学院精密仪器系',
+                                      name, email, link))
+        return self.all_info
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        bs = bs.find('div', {'class': 'information'})
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
         TsinghuaCivil: 0, TsinghuaEnv: 0, TsinghuaSppm: 0,
-        TsinghuaMe: 1
+        TsinghuaMe: 0, TsinghuaDpi: 1
     }
     return all_pack
 
 
 def main():
-    print(TsinghuaMe().run())
+    print(TsinghuaDpi().run())
 
 
 if __name__ == '__main__':
