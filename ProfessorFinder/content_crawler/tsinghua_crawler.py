@@ -171,7 +171,7 @@ class TsinghuaMe(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://me.tsinghua.edu.cn/szdw/ys.htm'
-        super().__init__(url, '信息科学技术学院机械工程系')
+        super().__init__(url, '机械工程学院机械工程系')
 
     def handler(self):
         all_professors = {}
@@ -213,7 +213,7 @@ class TsinghuaDpi(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://faculty.dpi.tsinghua.edu.cn/index.html'
-        super().__init__(url, '信息科学技术学院精密仪器系')
+        super().__init__(url, '机械工程学院精密仪器系')
 
     def handler(self):
         for bs in self.bs.find_all('div', {'class': 'third'}):
@@ -241,7 +241,7 @@ class TsinghuaTe(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.te.tsinghua.edu.cn/szdw/szxx1.htm'
-        super().__init__(url, '信息科学技术学院能源与动力工程系')
+        super().__init__(url, '机械工程学院能源与动力工程系')
 
     def handler(self):
         bs = self.bs.find('div', {'id': 'vsb_content'})
@@ -276,7 +276,7 @@ class TsinghuaSvm(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.svm.tsinghua.edu.cn/column/26_1.html'
-        super().__init__(url, '信息科学技术学院车辆与运载学院')
+        super().__init__(url, '机械工程学院车辆与运载学院')
 
     def handler(self):
         bs = self.bs.find('div', {'class': 'teacher-list'})
@@ -305,7 +305,7 @@ class TsinghuaIe(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.ie.tsinghua.edu.cn/List/index/cid/29.html'
-        super().__init__(url, '信息科学技术学院工业工程系')
+        super().__init__(url, '机械工程学院工业工程系')
 
     def handler(self):
         i = 0
@@ -343,7 +343,7 @@ class TsinghuaIcenter(TsinghuaCrawler):
 
     def __init__(self):
         url = 'http://www.icenter.tsinghua.edu.cn/szdw/zzjs.htm'
-        super().__init__(url, '信息科学技术学院基础工业训练中心')
+        super().__init__(url, '机械工程学院基础工业训练中心')
 
     def handler(self):
         bs = self.bs.find('div', {'class': 'entry-content font-mid'})
@@ -379,18 +379,153 @@ class TsinghuaIcenter(TsinghuaCrawler):
             return None
 
 
+class TsinghuaHy(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://www.hy.tsinghua.edu.cn/szqk/szxx.htm'
+        super().__init__(url, '航天航空学院')
+
+    def handler(self):
+        bs = self.bs.find('div', {'id': 'vsb_content'})
+        for professor in bs.find_all('a'):
+            name = professor.get_text()
+            try:
+                name = name.encode('iso8859-1').decode('utf-8')
+            except UnicodeDecodeError:
+                pass
+            name = ''.join(name.split())
+            link = professor.attrs['href'][2:]
+            link = self._internal_link_convert(link)
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        try:
+            r = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            return None
+        bs = BeautifulSoup(r.text, 'lxml')
+        bs = bs.find('div', {'class': 'teacher-p'})
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
+class TsinghuaSss(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://www.sss.tsinghua.edu.cn/szll.htm'
+        super().__init__(url, '社会科学学院')
+
+    def handler(self):
+        teacher_list = \
+            self.bs.find_all('div', {'class': 'teacher_list'})
+        for a_list in teacher_list:
+            for professor in a_list.find_all('li'):
+                name = professor.get_text()
+                name = name.encode('iso8859-1').decode('utf-8')
+                name = name.strip()
+                link = professor.a.attrs['href']
+                link = self._internal_link_convert('/' + link)
+                email = self._get_email(link)
+                self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            if email.group(0) == 'skxy@tsinghua.edu.cn':
+                raise AttributeError
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
+class TsinghuaCs(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://www.cs.tsinghua.edu.cn/szzk/jzgml.htm'
+        super().__init__(url, '信息科学技术学院电子工程系')
+
+    def handler(self):
+        bs = self.bs.find('div', {'class': 'people01-nr'})
+        for dl in bs.find_all('dl'):
+            for professor in dl.find_all('li'):
+                tar = professor.find('div', {'class': 'text'})
+                name = tar.h2.get_text()
+                name = name.encode('iso8859-1').decode('utf-8')
+                link = tar.a.attrs['href'][2:]
+                link = self._internal_link_convert(link)
+                try:
+                    email = re.search(self.mail_re, tar.get_text())
+                    email = email.group(0)
+                except AttributeError:
+                    email = None
+                self.append_info(name, email, link)
+        return self.get_info()
+
+
+class TsinghuaAu(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://www.au.tsinghua.edu.cn/szdw/jsdw1/ayjscz.htm'
+        super().__init__(url, '信息科学技术学院自动化系')
+
+    def handler(self):
+        teacher_list = \
+            self.bs.find_all('div', {'class': 'teacher-list'})
+        for li in teacher_list:
+            for professor in li.find_all('a'):
+                name = professor.get_text()
+                name = name.encode('iso8859-1').decode('utf-8')
+                link = professor.attrs['href']
+                if link == 'javascript:;':
+                    link = None
+                else:
+                    link = self._internal_link_convert(link[5:])
+                email = self._get_email(link)
+                self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        try:
+            r = requests.get(url)
+        except requests.exceptions.MissingSchema:
+            return None
+        bs = BeautifulSoup(r.text, 'lxml')
+        info_tab = bs.find('div', {'class': 'basic'})
+        email = re.search(cls.mail_re, info_tab.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
         TsinghuaCivil: 0, TsinghuaEnv: 0, TsinghuaSppm: 0,
         TsinghuaMe: 0, TsinghuaDpi: 0, TsinghuaTe: 0,
-        TsinghuaSvm: 0, TsinghuaIe: 0, TsinghuaIcenter: 1
+        TsinghuaSvm: 0, TsinghuaIe: 0, TsinghuaIcenter: 0,
+        TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
+        TsinghuaAu: 1
     }
     return all_pack
 
 
+uncrawled = ['马克思主义学院', '人文学院']
+
+
 def main():
-    print(TsinghuaIcenter().run())
+    print(TsinghuaAu().run())
 
 
 if __name__ == '__main__':
