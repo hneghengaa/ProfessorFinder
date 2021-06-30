@@ -509,6 +509,37 @@ class TsinghuaAu(TsinghuaCrawler):
             return None
 
 
+class TsinghuaSic(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.sic.tsinghua.edu.cn/szdw/rygc/szxx.htm'
+        super().__init__(url, '信息科学技术学院集成电路')
+
+    def handler(self):
+        bs = self.bs.find('div', {'class': 'clearfloat list_zhy'})
+        for professor in bs.find_all('a'):
+            name = professor.get_text()
+            name = name.encode('iso8859-1').decode('utf-8')
+            link = professor.attrs['href'][5:]
+            link = self._internal_link_convert(link)
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        try:
+            r = requests.get(url)
+        except requests.exceptions.InvalidURL:
+            return None
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
@@ -516,7 +547,7 @@ def get_pack():
         TsinghuaMe: 0, TsinghuaDpi: 0, TsinghuaTe: 0,
         TsinghuaSvm: 0, TsinghuaIe: 0, TsinghuaIcenter: 0,
         TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
-        TsinghuaAu: 1
+        TsinghuaAu: 0, TsinghuaSic: 1
     }
     return all_pack
 
@@ -525,7 +556,7 @@ uncrawled = ['马克思主义学院', '人文学院']
 
 
 def main():
-    print(TsinghuaAu().run())
+    print(TsinghuaSic().run())
 
 
 if __name__ == '__main__':
