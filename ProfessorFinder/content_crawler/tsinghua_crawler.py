@@ -568,6 +568,108 @@ class TsinghuaInsc(TsinghuaCrawler):
             return None
 
 
+class TsinghuaThss(TsinghuaCrawler):
+    pass
+
+
+class TsinghuaBnrist(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.bnrist.tsinghua.edu.cn/rcdw/jsml.htm'
+        super().__init__(url, '信息技术学院信息国家研究中心')
+
+    def handler(self):
+        bs = self.bs.find('div', {'id': 'vsb_content'})
+        for professor in bs.find_all('a'):
+            name = professor.get_text()
+            name = name.encode('iso8859-1').decode('utf-8')
+            link = professor.attrs['href']
+            if link == '#':
+                link = None
+                email = None
+            else:
+                link = self._internal_link_convert(link)
+                email = self._get_email(link)
+            print(name, link, email)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        try:
+            r = requests.get(url, timeout=2)
+        except requests.exceptions.ConnectionError:
+            return None
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
+class TsinghuaLaw(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.law.tsinghua.edu.cn/szll/byjs/zzjs.htm'
+        super().__init__(url, '法学院')
+
+    def handler(self):
+        bs = self.bs.find_all('div', {'class': 'side-name'})
+        for professor in bs:
+            name = professor.get_text()
+            name = name.encode('iso8859-1').decode('utf-8')
+            link = professor.a.attrs['href']
+            link = self._internal_link_convert(link)
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
+class TsinghuaTsjc(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.tsjc.tsinghua.edu.cn/xysz/jszy.htm'
+        super().__init__(url, '新闻与传播学院')
+
+    def handler(self):
+        for professor in self.bs.find_all('td'):
+            tab = professor.a
+            try:
+                name = tab.get_text()
+                try:
+                    name = ''.join(name.split())
+                    name = name.encode('iso8859-1').decode('utf-8')
+                except UnicodeDecodeError:
+                    pass
+                link = tab.attrs['href']
+            except AttributeError:
+                continue
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
@@ -575,16 +677,17 @@ def get_pack():
         TsinghuaMe: 0, TsinghuaDpi: 0, TsinghuaTe: 0,
         TsinghuaSvm: 0, TsinghuaIe: 0, TsinghuaIcenter: 0,
         TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
-        TsinghuaAu: 0, TsinghuaSic: 0, TsinghuaInsc: 1
+        TsinghuaAu: 0, TsinghuaSic: 0, TsinghuaInsc: 0,
+        TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 1
     }
     return all_pack
 
 
-uncrawled = ['马克思主义学院', '人文学院']
+uncrawled = ['马克思主义学院', '人文学院', '信息技术学院软件学院']
 
 
 def main():
-    print(TsinghuaInsc().run())
+    print(TsinghuaTsjc().run())
 
 
 if __name__ == '__main__':
