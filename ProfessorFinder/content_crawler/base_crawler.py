@@ -31,6 +31,8 @@ class WebCrawler(object):
         return self.handler()
 
     def _internal_link_convert(self, raw_link: str):
+        while raw_link.startswith('../'):
+            raw_link = raw_link[2:]
         if raw_link.startswith('/'):
             return self._scheme + '://' + self._netloc + raw_link
         elif re.match('^http(s)?://.+', raw_link):
