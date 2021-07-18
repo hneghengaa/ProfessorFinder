@@ -670,6 +670,63 @@ class TsinghuaTsjc(TsinghuaCrawler):
             return None
 
 
+class TsinghuaPbcsf(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://www.pbcsf.tsinghua.edu.cn/portal/list/index/id/10.html'
+        super().__init__(url, '五道口金融学院')
+
+    def handler(self):
+        with open('content_crawler/content_data/tsinghuaPbcsf.json', 'r') as f:
+            data = json.load(f)
+        for professor in data:
+            name = professor['title']
+            link = professor['url']
+            link = self._internal_link_convert(link)
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
+class TsinghuaMse(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.mse.tsinghua.edu.cn/szqk/jsdw1.htm'
+        super().__init__(url, '材料学院')
+
+    def handler(self):
+        bs = self.bs.find('div', {'class': 'szdw-list'})
+        table = bs.ul
+        for professor in table.find_all('li'):
+            name = professor.a.get_text()
+            name = name.encode('iso8859-1').decode('utf-8')
+            m = map(lambda x: '' if x == '　' or x == ' ' else x, name)
+            name = ''.join(m)
+            link = professor.a.attrs['href']
+            link = self._internal_link_convert(link)
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+        return self.get_info()
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        email = email.group(0)
+        return email if email != 'CLX@TSINGHUA.EDU.CN' else None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
@@ -678,7 +735,8 @@ def get_pack():
         TsinghuaSvm: 0, TsinghuaIe: 0, TsinghuaIcenter: 0,
         TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
         TsinghuaAu: 0, TsinghuaSic: 0, TsinghuaInsc: 0,
-        TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 1
+        TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 0,
+        TsinghuaPbcsf: 0, TsinghuaMse: 1
     }
     return all_pack
 
@@ -687,7 +745,7 @@ uncrawled = ['马克思主义学院', '人文学院', '信息技术学院软件�
 
 
 def main():
-    print(TsinghuaTsjc().run())
+    print(TsinghuaMse().run())
 
 
 if __name__ == '__main__':
