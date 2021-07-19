@@ -27,12 +27,9 @@ class WebCrawler(object):
         """
         # return self.all_info
 
-    def return_data(self):
+    def run(self):
         self.handler()
         return self.all_info
-
-    def run(self):
-        return self.return_data()
 
     def _internal_link_convert(self, raw_link: str):
         while raw_link.startswith('../'):
