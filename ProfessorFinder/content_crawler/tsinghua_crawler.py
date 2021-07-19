@@ -705,6 +705,37 @@ class TsinghuaMse(TsinghuaCrawler):
         return email if email != 'CLX@TSINGHUA.EDU.CN' else None
 
 
+class TsinghuaAd(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.ad.tsinghua.edu.cn/jsdw/jsml.htm'
+        super().__init__(url, '美术学院')
+
+    def handler(self):
+        bs = self.bs.find('div', {'id': 'vsb_content'})
+        for professor in bs.find_all('td'):
+            tab = professor.a
+            try:
+                name = tab.get_text()
+                name = name.encode('iso8859-1').decode('utf-8')
+                link = tab.attrs['href']
+                link = self._internal_link_convert(link)
+                email = self._get_email(link)
+                self.append_info(name, email, link)
+            except (AttributeError, UnicodeDecodeError):
+                pass
+
+    @classmethod
+    def _get_email(cls, url):
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            return email.group(0)
+        except AttributeError:
+            return None
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
@@ -714,7 +745,7 @@ def get_pack():
         TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
         TsinghuaAu: 0, TsinghuaSic: 0, TsinghuaInsc: 0,
         TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 0,
-        TsinghuaPbcsf: 0, TsinghuaMse: 1
+        TsinghuaPbcsf: 0, TsinghuaMse: 0, TsinghuaAd: 1
     }
     return all_pack
 
@@ -723,7 +754,7 @@ uncrawled = ['马克思主义学院', '人文学院', '信息技术学院软件�
 
 
 def main():
-    print(TsinghuaMse().run())
+    TsinghuaAd().run()
 
 
 if __name__ == '__main__':
