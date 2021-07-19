@@ -37,7 +37,6 @@ class TsinghuaArch(TsinghuaCrawler):
                 self.append_info(name, url_tab, email)
             except AttributeError:
                 pass
-        return self.get_info()
 
 
 class TsinghuaSem(TsinghuaCrawler):
@@ -56,7 +55,6 @@ class TsinghuaSem(TsinghuaCrawler):
         for each in data_list:
             self.append_info(each['name'], each['email'],
                              each['detailurl'])
-        return self.get_info()
 
 
 class TsinghuaCivil(TsinghuaCrawler):  # something to solve?
@@ -77,7 +75,6 @@ class TsinghuaCivil(TsinghuaCrawler):  # something to solve?
         for name, link in data_link.items():
             mail = self._get_mail(link)
             self.append_info(name, mail, link)
-        return self.get_info()
 
     @classmethod
     def _get_mail(cls, link):
@@ -123,7 +120,6 @@ class TsinghuaEnv(TsinghuaCrawler):
         for professor, link in professors.items():
             mail = self._get_mail(link)
             self.append_info(professor, mail, link)
-        return self.get_info()
 
     @classmethod
     def _get_mail(cls, url):
@@ -164,7 +160,6 @@ class TsinghuaSppm(TsinghuaCrawler):
             email = None if email_tab.get_text().isspace() \
                 else email_tab.get_text()
             self.append_info(name, email, link)
-        return self.get_info()
 
 
 class TsinghuaMe(TsinghuaCrawler):
@@ -195,7 +190,6 @@ class TsinghuaMe(TsinghuaCrawler):
         for name, link in all_professors.items():
             email = self._get_mail(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_mail(cls, url):
@@ -223,7 +217,6 @@ class TsinghuaDpi(TsinghuaCrawler):
                 link = self._internal_link_convert(link)
                 email = self._get_email(link)
                 self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -258,7 +251,6 @@ class TsinghuaTe(TsinghuaCrawler):
                     self.append_info(name, email, link)
                 except AttributeError:
                     continue
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -287,7 +279,6 @@ class TsinghuaSvm(TsinghuaCrawler):
             link = self._internal_link_convert(link[2:])
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -317,7 +308,6 @@ class TsinghuaIe(TsinghuaCrawler):
                 link = self._internal_link_convert(link)
                 email = self._get_email(link, i)
                 self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url, i):
@@ -363,7 +353,6 @@ class TsinghuaIcenter(TsinghuaCrawler):
                 link = self._internal_link_convert(link[2:])
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -398,7 +387,6 @@ class TsinghuaHy(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -433,7 +421,6 @@ class TsinghuaSss(TsinghuaCrawler):
                 link = self._internal_link_convert('/' + link)
                 email = self._get_email(link)
                 self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -469,7 +456,6 @@ class TsinghuaCs(TsinghuaCrawler):
                 except AttributeError:
                     email = None
                 self.append_info(name, email, link)
-        return self.get_info()
 
 
 class TsinghuaAu(TsinghuaCrawler):
@@ -492,7 +478,6 @@ class TsinghuaAu(TsinghuaCrawler):
                     link = self._internal_link_convert(link[5:])
                 email = self._get_email(link)
                 self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -524,7 +509,6 @@ class TsinghuaSic(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -555,7 +539,6 @@ class TsinghuaInsc(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -592,7 +575,6 @@ class TsinghuaBnrist(TsinghuaCrawler):
                 email = self._get_email(link)
             print(name, link, email)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -623,7 +605,6 @@ class TsinghuaLaw(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -657,7 +638,6 @@ class TsinghuaTsjc(TsinghuaCrawler):
                 continue
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -685,7 +665,6 @@ class TsinghuaPbcsf(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):
@@ -716,7 +695,6 @@ class TsinghuaMse(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-        return self.get_info()
 
     @classmethod
     def _get_email(cls, url):

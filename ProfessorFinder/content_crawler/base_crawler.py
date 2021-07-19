@@ -25,10 +25,14 @@ class WebCrawler(object):
         return school, department, name, email, bio of teacher.
         :return:
         """
+        # return self.all_info
+
+    def return_data(self):
+        self.handler()
         return self.all_info
 
     def run(self):
-        return self.handler()
+        return self.return_data()
 
     def _internal_link_convert(self, raw_link: str):
         while raw_link.startswith('../'):
