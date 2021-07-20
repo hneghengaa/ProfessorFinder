@@ -58,10 +58,17 @@ class WebCrawler(object):
         return BeautifulSoup(self._page.text, 'lxml')
 
     @classmethod
-    def _get_email(cls, url):
+    def _get_email(cls, url, junk=None):
         """
-        needs to be overwritten
+        may need to be overwritten
         receive a url then parse the page
         and return email if possible.
         """
-        return ''
+        r = requests.get(url)
+        bs = BeautifulSoup(r.text, 'lxml')
+        email = re.search(cls.mail_re, bs.get_text())
+        try:
+            email = email.group(0)
+            return None if email == junk else email
+        except AttributeError:
+            return None
