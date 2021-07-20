@@ -64,7 +64,12 @@ class WebCrawler(object):
         receive a url then parse the page
         and return email if possible.
         """
-        r = requests.get(url)
+        try:
+            r = requests.get(url, timeout=5)
+        except requests.exceptions.ConnectionError:
+            return None
+        except requests.exceptions.InvalidURL:
+            return None
         bs = BeautifulSoup(r.text, 'lxml')
         email = re.search(cls.mail_re, bs.get_text())
         try:
