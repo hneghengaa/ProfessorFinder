@@ -649,8 +649,55 @@ class TsinghuaPhys(TsinghuaCrawler):
             link = tab.attrs['href']
             link = self._internal_link_convert(link)
             email = self._get_email(link, 'wlx@tsinghua.edu.cn')
-            print(name, link, email)
             self.append_info(name, email, link)
+
+
+class TsinghuaChem(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.chem.tsinghua.edu.cn/szdw/zzjg/apypx1.htm'
+        super().__init__(url, '化学系')
+
+    def handler(self):
+        p = self.bs.find_all('a', {'class': 'zhy_tittle'})
+        for professor in p:
+            try:
+                name = professor.attrs['title']
+                name = name.encode('iso8859-1').decode('utf-8')
+                link = professor.attrs['href']
+                link = self._internal_link_convert(link)
+            except KeyError:
+                continue
+            email = self._get_email(link)
+            self.append_info(name, email, link)
+
+
+class TsinghuaDess(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'https://www.dess.tsinghua.edu.cn/sz/qzjs.htm'
+        super().__init__(url, '地球系统科学系')
+
+    def handler(self):
+        v_links = [
+            'https://www.dess.tsinghua.edu.cn/sz/qzjs.htm',
+            'https://www.dess.tsinghua.edu.cn/sz/qzjs/2.htm',
+            'https://www.dess.tsinghua.edu.cn/sz/qzjs/1.htm'
+        ]
+        for each_link in v_links:
+            r = requests.get(each_link)
+            bs = BeautifulSoup(r.text, 'lxml')
+            bs = bs.find('section', {'class': 'n_renwu'})
+            for professor in bs.find_all('li'):
+                tab = professor.a
+                name = tab.attrs['title']
+                name = name.encode('iso8859-1').decode('utf-8')
+                link = tab.attrs['href']
+                link = self._internal_link_convert(link)
+                email = self._get_email(link,
+                                        'dess@mail.tsinghua.edu.cn')
+                print(name, link, email)
+                self.append_info(name, email, link)
 
 
 def get_pack():
@@ -664,7 +711,7 @@ def get_pack():
         TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 0,
         TsinghuaPbcsf: 0, TsinghuaMse: 0, TsinghuaAd: 0,
         TsinghuaEea: 0, TsinghuaEp: 0, TsinghuaIoe: 0,
-        TsinghuaPhys: 1
+        TsinghuaPhys: 0, TsinghuaChem: 0, TsinghuaDess: 1
     }
     return all_pack
 
