@@ -73,20 +73,8 @@ class TsinghuaCivil(TsinghuaCrawler):  # something to solve?
             link = people.attrs['href']
             data_link[name] = link
         for name, link in data_link.items():
-            mail = self._get_mail(link)
+            mail = self._get_mail(link, 'slxbgs@tsinghua.edu.cn')
             self.append_info(name, mail, link)
-
-    @classmethod
-    def _get_mail(cls, link):
-        response = requests.get(link)
-        bs = BeautifulSoup(response.text, 'lxml')
-        bs = bs.find('div', {'class': 'essay_field'})
-        bs = bs.find('div', {'class': 'content'})
-        mail = re.search(cls.mail_re, bs.get_text())
-        try:
-            return mail.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaEnv(TsinghuaCrawler):
@@ -120,22 +108,6 @@ class TsinghuaEnv(TsinghuaCrawler):
         for professor, link in professors.items():
             mail = self._get_mail(link)
             self.append_info(professor, mail, link)
-
-    @classmethod
-    def _get_mail(cls, url):
-        resp = requests.get(url)
-        bs = BeautifulSoup(resp.text, 'lxml')
-        pattern = re.compile(r'vsb_content.*')
-        try:
-            bs = bs.find('div', {'id': pattern}).table
-        except AttributeError:
-            return None
-        info = bs.get_text()
-        mail = re.search(cls.mail_re, info)
-        try:
-            return mail.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaSppm(TsinghuaCrawler):
@@ -184,23 +156,12 @@ class TsinghuaMe(TsinghuaCrawler):
             name = professor.attrs['title'] \
                 .encode('iso8859-1').decode('utf-8')
             link = professor.attrs['href']
-            link = self._internal_link_convert(link[2:])
+            link = self._internal_link_convert(link)
             all_professors[name] = link
 
         for name, link in all_professors.items():
-            email = self._get_mail(link)
+            email = self._get_mail(link, 'mayue@tsinghua.edu.cn')
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_mail(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        tab = bs.find('div', {'class': 't-info-text fl'})
-        email = re.search(cls.mail_re, tab.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaDpi(TsinghuaCrawler):
@@ -218,17 +179,6 @@ class TsinghuaDpi(TsinghuaCrawler):
                 email = self._get_email(link)
                 self.append_info(name, email, link)
 
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        bs = bs.find('div', {'class': 'information'})
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
-
 
 class TsinghuaTe(TsinghuaCrawler):
 
@@ -245,23 +195,10 @@ class TsinghuaTe(TsinghuaCrawler):
                     name = name.encode('iso8859-1').decode('utf-8')
                     name = name.strip().replace(' ', '')
                     link = professor.a.attrs['href']
-                    if link.startswith('../'):
-                        link = self._internal_link_convert(link[2:])
                     email = self._get_email(link)
                     self.append_info(name, email, link)
                 except AttributeError:
                     continue
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        t = bs.find('div', {'class': 'teacher-p'}).get_text()
-        email = re.search(cls.mail_re, t)
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaSvm(TsinghuaCrawler):
@@ -276,20 +213,9 @@ class TsinghuaSvm(TsinghuaCrawler):
             name = professor.get_text()
             name = name.encode('iso8859-1').decode('utf-8')
             link = professor.attrs['href']
-            link = self._internal_link_convert(link[2:])
-            email = self._get_email(link)
+            link = self._internal_link_convert(link)
+            email = self._get_email(link, 'qcxbgs@tsinghua.edu.cn')
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        bs = bs.find('div', {'class': 'desc'})
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaIe(TsinghuaCrawler):
@@ -348,10 +274,10 @@ class TsinghuaIcenter(TsinghuaCrawler):
                 name = name.encode('iso8859-1').decode('utf-8')
                 link = node.attrs['href']
             if link == 'javascript:;':
-                link = None
+                pass
             else:
-                link = self._internal_link_convert(link[2:])
-            email = self._get_email(link)
+                link = self._internal_link_convert(link)
+            email = self._get_email(link, 'saturn@tsinghua.edu.cn')
             self.append_info(name, email, link)
 
     @classmethod
@@ -383,24 +309,10 @@ class TsinghuaHy(TsinghuaCrawler):
             except UnicodeDecodeError:
                 pass
             name = ''.join(name.split())
-            link = professor.attrs['href'][2:]
+            link = professor.attrs['href']
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        try:
-            r = requests.get(url)
-        except requests.exceptions.ConnectionError:
-            return None
-        bs = BeautifulSoup(r.text, 'lxml')
-        bs = bs.find('div', {'class': 'teacher-p'})
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaSss(TsinghuaCrawler):
@@ -419,20 +331,8 @@ class TsinghuaSss(TsinghuaCrawler):
                 name = name.strip()
                 link = professor.a.attrs['href']
                 link = self._internal_link_convert('/' + link)
-                email = self._get_email(link)
+                email = self._get_email(link, 'skxy@tsinghua.edu.cn')
                 self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            if email.group(0) == 'skxy@tsinghua.edu.cn':
-                raise AttributeError
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaCs(TsinghuaCrawler):
@@ -510,19 +410,6 @@ class TsinghuaSic(TsinghuaCrawler):
             email = self._get_email(link)
             self.append_info(name, email, link)
 
-    @classmethod
-    def _get_email(cls, url):
-        try:
-            r = requests.get(url)
-        except requests.exceptions.InvalidURL:
-            return None
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
-
 
 class TsinghuaInsc(TsinghuaCrawler):
 
@@ -539,16 +426,6 @@ class TsinghuaInsc(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaThss(TsinghuaCrawler):
@@ -576,19 +453,6 @@ class TsinghuaBnrist(TsinghuaCrawler):
             print(name, link, email)
             self.append_info(name, email, link)
 
-    @classmethod
-    def _get_email(cls, url):
-        try:
-            r = requests.get(url, timeout=2)
-        except requests.exceptions.ConnectionError:
-            return None
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
-
 
 class TsinghuaLaw(TsinghuaCrawler):
 
@@ -605,16 +469,6 @@ class TsinghuaLaw(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaTsjc(TsinghuaCrawler):
@@ -639,16 +493,6 @@ class TsinghuaTsjc(TsinghuaCrawler):
             email = self._get_email(link)
             self.append_info(name, email, link)
 
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
-
 
 class TsinghuaPbcsf(TsinghuaCrawler):
 
@@ -665,16 +509,6 @@ class TsinghuaPbcsf(TsinghuaCrawler):
             link = self._internal_link_convert(link)
             email = self._get_email(link)
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
 
 
 class TsinghuaMse(TsinghuaCrawler):
@@ -693,16 +527,8 @@ class TsinghuaMse(TsinghuaCrawler):
             name = ''.join(m)
             link = professor.a.attrs['href']
             link = self._internal_link_convert(link)
-            email = self._get_email(link)
+            email = self._get_email(link, 'CLX@TSINGHUA.EDU.CN')
             self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        email = email.group(0)
-        return email if email != 'CLX@TSINGHUA.EDU.CN' else None
 
 
 class TsinghuaAd(TsinghuaCrawler):
@@ -725,16 +551,6 @@ class TsinghuaAd(TsinghuaCrawler):
             except (AttributeError, UnicodeDecodeError):
                 pass
 
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        try:
-            return email.group(0)
-        except AttributeError:
-            return None
-
 
 class TsinghuaEea(TsinghuaCrawler):
 
@@ -750,16 +566,8 @@ class TsinghuaEea(TsinghuaCrawler):
                 name = name.encode('iso8859-1').decode('utf-8')
                 link = professor.attrs['href']
                 link = self._internal_link_convert(link)
-                email = self._get_email(link)
+                email = self._get_email(link, 'ee@tsinghua.edu.cn')
                 self.append_info(name, email, link)
-
-    @classmethod
-    def _get_email(cls, url):
-        r = requests.get(url)
-        bs = BeautifulSoup(r.text, 'lxml')
-        email = re.search(cls.mail_re, bs.get_text())
-        email = email.group(0)
-        return None if email == 'ee@tsinghua.edu.cn' else email
 
 
 class TsinghuaEp(TsinghuaCrawler):
@@ -833,8 +641,8 @@ def get_pack():
         TsinghuaHy: 0, TsinghuaSss: 0, TsinghuaCs: 0,
         TsinghuaAu: 0, TsinghuaSic: 0, TsinghuaInsc: 0,
         TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 0,
-        TsinghuaPbcsf: 0, TsinghuaMse: 0, TsinghuaAd: 0,
-        TsinghuaEea: 0, TsinghuaEp: 0, TsinghuaIoe: 1
+        TsinghuaPbcsf: 0, TsinghuaMse: 0, TsinghuaAd: 1,
+        TsinghuaEea: 0, TsinghuaEp: 0, TsinghuaIoe: 0
     }
     return all_pack
 
