@@ -721,13 +721,13 @@ class TsinghuaAstro(TsinghuaCrawler):
 
 
 class TsinghuaLife(TsinghuaCrawler):
-    
+
     def __init__(self):
         url = 'https://life.tsinghua.edu.cn/szdw/jzyg1.htm'
         super().__init__(url, '生命科学学院')
 
     def handler(self):
-        pls = self.bs.find_all('div',{'class':'pepolelist'})
+        pls = self.bs.find_all('div', {'class': 'pepolelist'})
         for pl in pls:
             bs = pl.find_all('ul', {'class': 'clearfix'})
             for professors in bs:
@@ -741,7 +741,7 @@ class TsinghuaLife(TsinghuaCrawler):
                         link = None
                     self.append_info(name, email, link)
 
-    
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
