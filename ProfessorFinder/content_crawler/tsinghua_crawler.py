@@ -700,6 +700,26 @@ class TsinghuaDess(TsinghuaCrawler):
                 self.append_info(name, email, link)
 
 
+class TsinghuaAstro(TsinghuaCrawler):
+
+    def __init__(self):
+        url = 'http://astro.tsinghua.edu.cn/index.php' \
+              '/zh/people-faculty'
+        super().__init__(url, '天文系')
+
+    def handler(self):
+        bs = self.bs.find('div', {'id': 'ce-category-88'})
+        for tabs in bs.find_all('tbody'):
+            for professor in tabs.find_all('tr'):
+                name = professor.find('td', {'class': 'item-title'})
+                link = name.a.attrs['href']
+                link = self._internal_link_convert(link)
+                name = name.get_text()
+                email = self._get_email(link)
+                print(name, link, email)
+                self.append_info(name, email, link)
+
+
 def get_pack():
     all_pack = {
         '清华大学': 0, TsinghuaArch: 0, TsinghuaSem: 0,
@@ -711,7 +731,8 @@ def get_pack():
         TsinghuaBnrist: 0, TsinghuaLaw: 0, TsinghuaTsjc: 0,
         TsinghuaPbcsf: 0, TsinghuaMse: 0, TsinghuaAd: 0,
         TsinghuaEea: 0, TsinghuaEp: 0, TsinghuaIoe: 0,
-        TsinghuaPhys: 0, TsinghuaChem: 0, TsinghuaDess: 1
+        TsinghuaPhys: 0, TsinghuaChem: 0, TsinghuaDess: 0,
+        TsinghuaAstro: 1
     }
     return all_pack
 
@@ -721,7 +742,7 @@ uncrawled = ['马克思主义学院', '人文学院', '信息技术学院软件�
 
 
 def main():
-    TsinghuaPhys().run()
+    TsinghuaAstro().run()
 
 
 if __name__ == '__main__':
