@@ -1,1 +1,3 @@
-__all__ = ['tsinghua_crawler']
+__all__ = [
+    'tsinghua_crawler', 'PKU_crawler', 'RUC_crawler'
+]
