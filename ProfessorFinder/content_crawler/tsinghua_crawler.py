@@ -2,7 +2,7 @@ import re
 import json
 import requests
 from bs4 import BeautifulSoup
-from base_crawler import WebCrawler
+from ProfessorFinder.content_crawler.base_crawler import WebCrawler
 
 
 class TsinghuaCrawler(WebCrawler):

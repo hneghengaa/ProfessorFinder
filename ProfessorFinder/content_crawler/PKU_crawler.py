@@ -6,7 +6,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from requests.api import request
-from base_crawler import WebCrawler
+from  ProfessorFinder.content_crawler.base_crawler import WebCrawler
 
 
 class PKUCrawler(WebCrawler):
@@ -36,13 +36,9 @@ class PKUPhy(PKUCrawler):
             link = teacher['url']
             if link== 'javascript:void(0)':
                 link = None
-            print(name, link, email)
+            self.append_info(name, email, link)
         
         
-       
-
-   
-
 def get_pack():
     all_pack = {
         '北京大学': 0, PKUPhy: 1
