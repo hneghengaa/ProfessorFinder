@@ -37,15 +37,14 @@ class PKUPhy(PKUCrawler):
             self.append_info(name, email, link)
 
 
-
 class PKUChem(PKUCrawler):
 
     def __init__(self):
         url = 'https://www.chem.pku.edu.cn/szll/zzjs/index.htm'
         super().__init__(url, '化学与分子工程学院')
-    
+
     def handler(self):
-        bs = self.bs.find_all('ul', {'class':'dList_info'})
+        bs = self.bs.find_all('ul', {'class': 'dList_info'})
         for prlist in bs:
             for professor in prlist.find_all('li'):
                 name = professor.get_text()
@@ -54,13 +53,14 @@ class PKUChem(PKUCrawler):
                 if link.startswith('http'):
                     pass
                 else:
-                    link ='https://www.chem.pku.edu.cn/szll/zzjs/'+link
+                    link = 'https://www.chem.pku.edu.cn/szll/zzjs/' + link
                 email = self._get_email(link)
                 self.append_info(name, email, link)
 
+
 def get_pack():
     all_pack = {
-        '北京大学': 0, PKUPhy: 0, PKUChem:1
+        '北京大学': 0, PKUPhy: 0, PKUChem: 1
     }
     return all_pack
 
